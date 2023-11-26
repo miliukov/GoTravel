@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route">Маршрут</string>
+    <string name="air_tickets">Авиабилеты</string>
+    <string name="hotels">Отели</string>
+    <string name="profile">Профиль</string>
+    <string name="where_to">Куда?</string>
+    <string name="when_to">Когда?</string>
+    <string name="where_from">Откуда?</string>
+    <string name="lets_go">Поехали!</string>
+</resources>

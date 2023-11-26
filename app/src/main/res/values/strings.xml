@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">GoTravel</string>
+    <string name="route">Маршрут</string>
+    <string name="air_tickets">Авиабилеты</string>
+    <string name="hotels">Отели</string>
+    <string name="profile">Профиль</string>
+    <string name="where_to">Куда поедем?</string>
+    <string name="when_to">Когда?</string>
+    <string name="where_from">Откуда?</string>
+    <string name="lets_go">Поехали!</string>
+    <string name="API_KEY" translatable="false">9941a14a305a272151185f303fe70807</string>
+</resources>

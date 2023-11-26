@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route">Route</string>
+    <string name="air_tickets">Air Tickets</string>
+    <string name="hotels">Hotels</string>
+    <string name="profile">Profile</string>
+    <string name="where_to">Where to?</string>
+    <string name="when_to">When?</string>
+    <string name="where_from">Where from?</string>
+    <string name="lets_go">Let\'s go!</string>
+</resources>
