@@ -1,53 +1,14 @@
-package com.example.gotravel
+package com.example.gotravel.data
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
-
-data class Flight(
-    val origin: String,
-    val destination: String,
-    val date: String,
-    val duration: Int,
-    val airline: String,
-    val price: Int
-)
-
-data class Airport(
-    val name: String,
-    val code: String,
-    val countryName: String,
-    val cityName: String,
-    val coordinates: String
-)
 
 fun findAirports(printed: String, context: Context): MutableState<List<Airport>> {
     val airports: MutableState<List<Airport>> = mutableStateOf(emptyList())
@@ -125,56 +86,4 @@ fun findFlights(
     )
     queue.add(stringRequest)
     return tickets
-}
-
-@Composable
-fun showFlights(tickets_m: MutableState<List<Flight>>) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        userScrollEnabled = true
-    ) {
-        items(arrayListOf(tickets_m.value)[0]) { ticket ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Box(
-
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .padding(start = 10.dp)
-                        ) {
-                            Row(
-                                
-                            ) {
-                                Text(text = ticket.airline)
-                                AsyncImage(
-                                    model = "http://pics.avs.io/200/200/${ticket.airline}.png",
-                                    contentDescription = null,
-                                )
-                            }
-                            Text(text = "buy")
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 10.dp),
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(text = ticket.duration.toString())
-                            Text(text = ticket.price.toString())
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.gotravel
+package com.example.gotravel.data
 
 import android.content.Context
 

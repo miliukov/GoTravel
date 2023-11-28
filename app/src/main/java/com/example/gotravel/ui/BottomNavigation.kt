@@ -1,4 +1,4 @@
-package com.example.gotravel
+package com.example.gotravel.ui
 
 import android.content.Context
 import androidx.compose.material.BottomNavigationItem
@@ -10,7 +10,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.gotravel.R
 
 @Composable
 fun BottomNavigation(
@@ -46,7 +50,7 @@ fun BottomNavigation(
                         fontSize = 9.sp
                     )
                 },
-                selectedContentColor = Color.Red,
+                selectedContentColor = LightBlue,
                 unselectedContentColor = Color.Gray
             )
         }
