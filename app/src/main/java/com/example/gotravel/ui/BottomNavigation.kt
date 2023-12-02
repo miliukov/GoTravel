@@ -41,7 +41,8 @@ fun BottomNavigation(
                 icon = {
                     Icon(
                         painter = painterResource(id = item.iconId),
-                        contentDescription = "Icon"
+                        contentDescription = "Icon",
+                        tint = if (currentRoute == item.route) LightBlue else Color.Black
                     )
                 },
                 label = {

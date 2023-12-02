@@ -20,12 +20,12 @@ import coil.compose.AsyncImage
 import com.example.gotravel.data.Flight
 
 @Composable
-fun showFlights(tickets_m: MutableState<List<Flight>>) {
+fun ShowFlights(ticketsM: MutableState<List<Flight>>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         userScrollEnabled = true
     ) {
-        items(arrayListOf(tickets_m.value)[0]) { ticket ->
+        items(arrayListOf(ticketsM.value)[0]) { ticket ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

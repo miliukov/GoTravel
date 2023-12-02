@@ -4,8 +4,11 @@
     <string name="air_tickets">Air Tickets</string>
     <string name="hotels">Hotels</string>
     <string name="profile">Profile</string>
-    <string name="where_to">Where to?</string>
-    <string name="when_to">When?</string>
-    <string name="where_from">Where from?</string>
     <string name="lets_go">Let\'s go!</string>
+    <string name="where_are_we_going">Where are we going?</string>
+    <string name="dates">Dates</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_return">I don\'t need a return ticket</string>
+    <string name="num_people">Number of people</string>
 </resources>

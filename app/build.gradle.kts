@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.android.volley:volley:1.2.1")
     implementation ("androidx.navigation:navigation-compose:2.6.0-alpha04")
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")

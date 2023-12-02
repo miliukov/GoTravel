@@ -4,9 +4,12 @@
     <string name="air_tickets">Авиабилеты</string>
     <string name="hotels">Отели</string>
     <string name="profile">Профиль</string>
-    <string name="where_to">Куда поедем?</string>
-    <string name="when_to">Когда?</string>
-    <string name="where_from">Откуда?</string>
     <string name="lets_go">Поехали!</string>
     <string name="API_KEY" translatable="false">9941a14a305a272151185f303fe70807</string>
+    <string name="where_are_we_going">Куда отправимся?</string>
+    <string name="dates">Даты</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="cancel">Отмена</string>
+    <string name="no_return">Обратный билет не нужен</string>
+    <string name="num_people">Количество людей</string>
 </resources>

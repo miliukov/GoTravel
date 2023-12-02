@@ -19,10 +19,7 @@ fun NavGraph(
             BottomNavigation(navController = navHostController, context)
         }
     ) {
-        NavHost(navController = navHostController, startDestination = "splash_screen") {
-            composable("splash_screen") {
-                AnimatedSplashScreen(navHostController, context)
-            }
+        NavHost(navController = navHostController, startDestination = "screen_1") {
             composable("screen_1") {
                 showRoute(context)
             }
