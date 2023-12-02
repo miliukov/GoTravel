@@ -21,7 +21,7 @@ fun NavGraph(
     ) {
         NavHost(navController = navHostController, startDestination = "screen_1") {
             composable("screen_1") {
-                showRoute(context)
+                ShowRoute(context)
             }
             composable("screen_2") {
                 // air tickets
