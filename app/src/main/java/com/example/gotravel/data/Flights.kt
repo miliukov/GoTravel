@@ -10,41 +10,6 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 
-fun findAirports(printed: String, context: Context): MutableState<List<Airport>> {
-    val airports: MutableState<List<Airport>> = mutableStateOf(emptyList())
-    val locale = context.resources.configuration.locales[0].language
-    val url = "https://autocomplete.travelpayouts.com/places2?locale=$locale&" +
-            "types[]=airport&types[]=city&term=$printed"
-    val queue = Volley.newRequestQueue(context)
-    val stringRequest = StringRequest(
-        Request.Method.GET,
-        url,
-        { response ->
-            val obj = JSONArray(response)
-            val airportList = mutableListOf<Airport>()
-            for (i in 0 until obj.length()) {
-                val jsonObject = obj.getJSONObject(i)
-                if (jsonObject.getString("type") == "airport") {
-                    airportList.add(
-                        Airport(
-                            jsonObject.getString("name"),
-                            jsonObject.getString("code"),
-                            jsonObject.getString("country_name"),
-                            jsonObject.getString("city_name"),
-                            jsonObject.getString("coordinates")))
-                }
-            }
-            airports.value = airportList
-        },
-        { error ->
-            airports.value = emptyList()
-        }
-    )
-    queue.add(stringRequest)
-    Log.d("MyLog", airports.value.toString())
-    return airports
-}
-
 fun findFlights(
     origin: String,
     destination: String,

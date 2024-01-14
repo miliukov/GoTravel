@@ -12,4 +12,5 @@
     <string name="cancel">Отмена</string>
     <string name="no_return">Обратный билет не нужен</string>
     <string name="num_people">Количество людей</string>
+    <string name="popular_destinations">Популярные маршруты</string>
 </resources>
