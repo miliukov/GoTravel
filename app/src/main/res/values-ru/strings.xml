@@ -12,4 +12,8 @@
     <string name="no_return">Обратный билет не нужен</string>
     <string name="num_people">Количество людей</string>
     <string name="popular_destinations">Популярные направления</string>
+    <string name="where_to">Куда</string>
+    <string name="where_from">Откуда</string>
+    <string name="moscow">Москва</string>
+    <string name="economy">Эконом</string>
 </resources>

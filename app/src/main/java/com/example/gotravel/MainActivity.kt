@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
+import com.example.gotravel.ui.AppTheme
 import com.example.gotravel.ui.NavGraph
 
 class MainActivity : ComponentActivity() {
@@ -12,8 +13,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContent {
-            val navController = rememberNavController()
-            NavGraph(navHostController = navController, this)
+            AppTheme {
+                val navController = rememberNavController()
+                NavGraph(navHostController = navController, this)
+            }
         }
     }
 }

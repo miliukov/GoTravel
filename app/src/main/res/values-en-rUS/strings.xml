@@ -12,4 +12,8 @@
     <string name="no_return">I don\'t need a return ticket</string>
     <string name="num_people">Number of people</string>
     <string name="popular_destinations">Popular routes</string>
+    <string name="where_to">Where to</string>
+    <string name="where_from">Where from</string>
+    <string name="moscow">Moscow</string>
+    <string name="economy">Economy</string>
 </resources>

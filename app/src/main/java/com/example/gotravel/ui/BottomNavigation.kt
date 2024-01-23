@@ -10,9 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.gotravel.R
 
@@ -42,7 +39,7 @@ fun BottomNavigation(
                     Icon(
                         painter = painterResource(id = item.iconId),
                         contentDescription = "Icon",
-                        tint = if (currentRoute == item.route) LightBlue else Color.Black
+                        tint = if (currentRoute == item.route) goTravel_theme_light_primary else Color.Black
                     )
                 },
                 label = {
@@ -51,7 +48,7 @@ fun BottomNavigation(
                         fontSize = 9.sp
                     )
                 },
-                selectedContentColor = LightBlue,
+                selectedContentColor = goTravel_theme_light_primary,
                 unselectedContentColor = Color.Gray
             )
         }

@@ -1,7 +1,6 @@
 package com.example.gotravel.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,25 +14,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,20 +40,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import androidx.compose.ui.window.Dialog
 import com.example.gotravel.R
-import com.example.gotravel.data.Airport
-import com.example.gotravel.data.IATAToName
 import com.example.gotravel.data.PopularDestination
-import com.example.gotravel.data.findCity
 import com.example.gotravel.data.findPopularDestinations
 import java.util.Calendar
 import java.util.TimeZone
@@ -64,11 +56,11 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowRoute(context: Context) {
-    var currentIndex by remember { mutableStateOf(0) }
-    var destination by remember { mutableStateOf("") }
-    var dateLabel by remember { mutableStateOf("") }
     var isDatePicker1Visible by remember { mutableStateOf(false) }
     var isDatePicker2Visible by remember { mutableStateOf(false) }
+    var isPeopleCountVisible by remember { mutableStateOf(false) }
+    var selectedPeople by remember { mutableStateOf(1) }
+    var selectedClass by remember { mutableStateOf(context.getString(R.string.economy)) }
     var selected1Date by remember { mutableStateOf(0L) }
     var selected2Date by remember { mutableStateOf(0L) }
     var date = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
@@ -88,42 +80,91 @@ fun ShowRoute(context: Context) {
             Box(
                 modifier = Modifier
                     .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-                    .background(LightBlue, shape = RoundedCornerShape(10.dp)),
+                    .background(goTravel_theme_light_primary, shape = RoundedCornerShape(10.dp)),
 
                 ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    showOrigin(context)
-                    Canvas(modifier = Modifier.fillMaxWidth()) {
-                        drawLine(
-                            color = Color.White,
-                            start = Offset(60f, 0f),
-                            end = Offset(size.width - 150f, 0f),
-                            strokeWidth = 1f
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(0.90f)
+                    ) {
+                        Button(
+                            onClick = { /*что-то*/ },
+                            shape = RoundedCornerShape(5.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    top = 1.dp,
+                                    start = 10.dp,
+                                    end = 10.dp
+                                ),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = goTravel_theme_light_primary,
+                                contentColor = Color.White,
+                            ),
+                            contentPadding = PaddingValues(start = 5.dp, top = 12.dp)
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = context.getString(R.string.moscow),
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(R.font.iter))
+                                )
+                            }
+                        }
+                        Canvas(
+                            modifier = Modifier
+                                .size(320.dp, 1.dp)
+                                .padding(start = 15.dp),) {
+                            drawLine(
+                                color = Color.White,
+                                start = Offset(0f, 0f),
+                                end = Offset(size.width, 0f),
+                                strokeWidth = 1f
+                            )
+                        }
+                        Button(
+                            onClick = { /*что-то*/ },
+                            shape = RoundedCornerShape(5.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    top = 1.dp,
+                                    start = 10.dp,
+                                    end = 10.dp
+                                ),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = goTravel_theme_light_primary,
+                                contentColor = Color.White
+                            ),
+                            contentPadding = PaddingValues(start = 5.dp, bottom = 12.dp)
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = context.getString(R.string.where_to),
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(R.font.iter))
+                                )
+                            }
+                        }
+                    }
+                    Button(
+                        onClick = { /*что-то*/ },
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = goTravel_theme_light_primary,
+                        ),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrows),
+                            contentDescription = "Icon",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(25.dp)
                         )
                     }
-                    OutlinedTextField( // куда
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = 1.dp,
-                                start = 10.dp,
-                                end = 10.dp
-                            ),
-                        value = destination,
-                        onValueChange = {
-                            destination = it
-
-                                        },
-                        textStyle = TextStyle(color = Color.White, fontSize = 20.sp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            cursorColor = Color.Blue,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            disabledBorderColor = Color.Transparent,
-                        )
-                    )
                 }
             }
             Row(
@@ -135,7 +176,7 @@ fun ShowRoute(context: Context) {
                     },
                     modifier = Modifier.padding(end = 5.dp, start = 20.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = LightLightBlue,
+                        containerColor = goTravel_theme_light_primaryContainer,
                         contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(10.dp),
@@ -148,7 +189,7 @@ fun ShowRoute(context: Context) {
                         Icon(
                             painter = painterResource(id = R.drawable.calendar),
                             contentDescription = "Icon",
-                            tint = LightBlue,
+                            tint = goTravel_theme_light_primary,
                             modifier = Modifier
                                 .size(26.dp)
                                 .padding(end = 2.dp)
@@ -169,14 +210,14 @@ fun ShowRoute(context: Context) {
 
                 }
                 Button(
-                    onClick = { },
+                    onClick = { isPeopleCountVisible = !isPeopleCountVisible },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = LightLightBlue,
+                        containerColor = goTravel_theme_light_primaryContainer,
                         contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text(text = context.getString(R.string.num_people))
+                    Text(text = "$selectedPeople, $selectedClass")
                 }
             }
             Text(
@@ -189,7 +230,7 @@ fun ShowRoute(context: Context) {
                 fontFamily = FontFamily(Font(R.font.iter)),
                 fontWeight = FontWeight.Bold
             )
-            showPopularDestinations("MOW", context)
+            ShowPopularDestinations("MOW", context)
         }
     }
 
@@ -242,10 +283,60 @@ fun ShowRoute(context: Context) {
             )
         }
     }
+    if (isPeopleCountVisible) {
+        var peopleCount by remember { mutableStateOf(selectedPeople) }
+        Dialog(
+            onDismissRequest = { isPeopleCountVisible = !isPeopleCountVisible },
+
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Text(
+                    text = peopleCount.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.Center),
+                    textAlign = TextAlign.Center,
+                )
+                Row() {
+                    Button(
+                        onClick = { peopleCount++ }
+                    ) {
+                        Text("+")
+                    }
+                    Button(
+                        onClick = { if (peopleCount > 1 ) peopleCount-- }
+                    ) {
+                        Text("-")
+                    }
+                }
+                TextButton(
+                    onClick = { isPeopleCountVisible = !isPeopleCountVisible },
+                ) {
+                    Text("Dismiss")
+                }
+                TextButton(
+                    onClick = {
+                        isPeopleCountVisible = !isPeopleCountVisible
+                        selectedPeople = peopleCount
+
+                    },
+                ) {
+                    Text("Confirm")
+                }
+            }
+        }
+
+    }
 }
 
 @Composable
-fun showPopularDestinations(origin: String, context: Context) {
+fun ShowPopularDestinations(origin: String, context: Context) {
     val state = remember {
         mutableStateOf<List<PopularDestination>>(emptyList())
     }
@@ -257,7 +348,8 @@ fun showPopularDestinations(origin: String, context: Context) {
         items(state.value) { destination ->
             Card(
                 modifier = Modifier
-                    .width(150.dp).height(150.dp)
+                    .width(150.dp)
+                    .height(150.dp)
                     .padding(5.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -277,36 +369,6 @@ fun showPopularDestinations(origin: String, context: Context) {
             }
         }
     }
-}
-
-@Composable
-fun showOrigin(context: Context) {
-    var origin by remember { mutableStateOf("") }
-    val list = remember {
-        mutableStateOf<List<Airport>>(emptyList())
-    }
-    OutlinedTextField( // откуда
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(
-                start = 10.dp,
-                bottom = 1.dp,
-                end = 10.dp
-            ),
-        value = origin,
-        onValueChange = {
-            origin = it
-            findCity(origin, context)
-        },
-        textStyle = TextStyle(color = Color.White, fontSize = 20.sp),
-        colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = Color.Blue,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            disabledBorderColor = Color.Transparent,
-        )
-    )
 }
 
 fun convertMillisToDate(selectedDateMillis: Long): String {
