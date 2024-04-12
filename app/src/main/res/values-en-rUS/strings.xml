@@ -16,4 +16,8 @@
     <string name="where_from">Where from</string>
     <string name="moscow">Moscow</string>
     <string name="economy">Economy</string>
+    <string name="error_net">Network connection error</string>
+    <string name="transfer_option">How to get there?</string>
+    <string name="by_plane">By plane</string>
+    <string name="by_car">By car</string>
 </resources>

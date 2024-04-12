@@ -16,4 +16,8 @@
     <string name="where_from">Откуда</string>
     <string name="moscow">Москва</string>
     <string name="economy">Эконом</string>
+    <string name="error_net">Ошибка подключения к сети</string>
+    <string name="transfer_option">Как добираться?</string>
+    <string name="by_plane">Самолётом</string>
+    <string name="by_car">Машиной</string>
 </resources>

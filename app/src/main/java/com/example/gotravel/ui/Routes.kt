@@ -1,6 +1,8 @@
 package com.example.gotravel.ui
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,18 +54,73 @@ import com.example.gotravel.data.PopularDestination
 import com.example.gotravel.data.findPopularDestinations
 import java.util.Calendar
 import java.util.TimeZone
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
+import android.os.Build
+import android.util.Log
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.ImageRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.example.gotravel.data.Airport
+import com.example.gotravel.data.Flight
+import com.example.gotravel.data.airlineLogo
+import com.example.gotravel.data.findCars
+import com.example.gotravel.data.findFlights
+import com.mapbox.geojson.Point
+import com.mapbox.maps.MapboxExperimental
+import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+
+val flights = mutableStateOf(emptyList<Flight>())
+var logo = mutableStateOf<ImageBitmap?>(null)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowRoute(context: Context) {
+fun ShowRoute(context: Context, navHostController: NavHostController) {
+    // navHostController.navigate("choose")
+    if (!isNetworkAvailable(context)) {
+        Dialog(onDismissRequest = {  }) {
+            Text(text = context.getString(R.string.error_net))
+        }
+    }
     var isDatePicker1Visible by remember { mutableStateOf(false) }
     var isDatePicker2Visible by remember { mutableStateOf(false) }
     var isPeopleCountVisible by remember { mutableStateOf(false) }
+    var isWhereFromVisible by remember { mutableStateOf(false) }
+    var isWhereToVisible by remember { mutableStateOf(false) }
+    var isNextVisible by remember { mutableStateOf(false) }
     var selectedPeople by remember { mutableStateOf(1) }
     var selectedClass by remember { mutableStateOf(context.getString(R.string.economy)) }
     var selected1Date by remember { mutableStateOf(0L) }
     var selected2Date by remember { mutableStateOf(0L) }
     var date = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+    var whereFrom by remember { mutableStateOf(context.getString(R.string.where_from)) }
+    var whereTo by remember { mutableStateOf(context.getString(R.string.where_to)) }
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -88,7 +145,7 @@ fun ShowRoute(context: Context) {
                         modifier = Modifier.fillMaxWidth(0.90f)
                     ) {
                         Button(
-                            onClick = { /*что-то*/ },
+                            onClick = { isWhereFromVisible = true },
                             shape = RoundedCornerShape(5.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -105,7 +162,7 @@ fun ShowRoute(context: Context) {
                         ) {
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = context.getString(R.string.moscow),
+                                    text = if (whereFrom == "") context.getString(R.string.where_from) else whereFrom,
                                     textAlign = TextAlign.Start,
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.iter))
@@ -124,7 +181,7 @@ fun ShowRoute(context: Context) {
                             )
                         }
                         Button(
-                            onClick = { /*что-то*/ },
+                            onClick = { isWhereToVisible = true },
                             shape = RoundedCornerShape(5.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -141,7 +198,7 @@ fun ShowRoute(context: Context) {
                         ) {
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = context.getString(R.string.where_to),
+                                    text = if (whereTo == "") context.getString(R.string.where_to) else whereTo,
                                     textAlign = TextAlign.Start,
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.iter))
@@ -150,7 +207,22 @@ fun ShowRoute(context: Context) {
                         }
                     }
                     Button(
-                        onClick = { /*что-то*/ },
+                        onClick = {
+                            if (whereFrom != context.getString(R.string.where_from) &&
+                                whereTo == context.getString(R.string.where_to)) {
+                                whereTo = whereFrom
+                                whereFrom = context.getString(R.string.where_from)
+                            }
+                            else if (whereFrom == context.getString(R.string.where_from) &&
+                                whereTo != context.getString(R.string.where_to)) {
+                                whereFrom = whereTo
+                                whereTo = context.getString(R.string.where_to)
+                            }
+                            else if (whereFrom != context.getString(R.string.where_from) &&
+                                whereTo != context.getString(R.string.where_to)) {
+                                whereTo = whereFrom.also { whereFrom = whereTo }
+                            }
+                                  },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = goTravel_theme_light_primary,
@@ -219,6 +291,21 @@ fun ShowRoute(context: Context) {
                 ) {
                     Text(text = "$selectedPeople, $selectedClass")
                 }
+                if (isNextVisible) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 20.dp),
+                        onClick = { navHostController.navigate("choose") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = goTravel_theme_light_primary,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("Далее")
+                    }
+                }
             }
             Text(
                 text = context.getString(R.string.popular_destinations),
@@ -231,6 +318,15 @@ fun ShowRoute(context: Context) {
                 fontWeight = FontWeight.Bold
             )
             ShowPopularDestinations("MOW", context)
+            Text(
+                text = "Выгодные предложения",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, top = 5.dp),
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.iter)),
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 
@@ -287,51 +383,169 @@ fun ShowRoute(context: Context) {
         var peopleCount by remember { mutableStateOf(selectedPeople) }
         Dialog(
             onDismissRequest = { isPeopleCountVisible = !isPeopleCountVisible },
-
         ) {
-            Card(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
+                color = goTravel_theme_light_primaryContainer
             ) {
-                Text(
-                    text = peopleCount.toString(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.Center),
-                    textAlign = TextAlign.Center,
-                )
-                Row() {
-                    Button(
-                        onClick = { peopleCount++ }
+                Column {
+                    Text(
+                        text = "Количество человек:",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center)
+                            .padding(top = 10.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.iter)),
+                        color = goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer
+                    )
+                    Text(
+                        text = peopleCount.toString(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center),
+                        textAlign = TextAlign.Center,
+                        fontSize = 34.sp,
+                        fontFamily = FontFamily(Font(R.font.iter)),
+                        color = goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
-                        Text("+")
+                        Button(
+                            onClick = { peopleCount++ },
+                            modifier = Modifier.padding(start = 20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = goTravel_theme_light_primary,
+                                contentColor = goTravel_theme_light_onPrimary_onSecondary_onTertiary_onError
+                            )
+                        ) {
+                            Text("+")
+                        }
+                        Spacer(modifier = Modifier.width(20.dp))
+                        Button(
+                            onClick = { if (peopleCount > 1 ) peopleCount-- },
+                            modifier = Modifier.padding(end = 20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = goTravel_theme_light_primary,
+                                contentColor = goTravel_theme_light_onPrimary_onSecondary_onTertiary_onError
+                            )
+                        ) {
+                            Text("-")
+                        }
                     }
-                    Button(
-                        onClick = { if (peopleCount > 1 ) peopleCount-- }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 20.dp),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text("-")
+                        TextButton(
+                            onClick = { isPeopleCountVisible = !isPeopleCountVisible },) {
+                            Text("Dismiss")
+                        }
+                        TextButton(
+                            onClick = {
+                                isPeopleCountVisible = !isPeopleCountVisible
+                                selectedPeople = peopleCount },) {
+                            Text("Confirm")
+                        }
                     }
-                }
-                TextButton(
-                    onClick = { isPeopleCountVisible = !isPeopleCountVisible },
-                ) {
-                    Text("Dismiss")
-                }
-                TextButton(
-                    onClick = {
-                        isPeopleCountVisible = !isPeopleCountVisible
-                        selectedPeople = peopleCount
-
-                    },
-                ) {
-                    Text("Confirm")
                 }
             }
         }
+    }
+    if (isWhereFromVisible) {
+        var text by remember { if (whereFrom != context.getString(R.string.where_from)) mutableStateOf(whereFrom) else mutableStateOf("") }
+        Dialog(
+            onDismissRequest = { isWhereFromVisible = false },
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(13.dp),
+                color = goTravel_theme_light_primaryContainer
+            ) {
+                Column {
+                    Text("Откуда?",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center),
+                        textAlign = TextAlign.Center,
+                        fontSize = 34.sp,
+                        fontFamily = FontFamily(Font(R.font.iter)),
+                        color = goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer,
+                        fontWeight = FontWeight.Bold)
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            cursorColor = Color.Black,
+                            focusedBorderColor = goTravel_theme_light_primary,
+                            unfocusedBorderColor = goTravel_theme_light_primary)
+                    )
+                    Button(onClick = {
+                        isWhereFromVisible = false
+                        whereFrom = text
+                        isNextVisible = whereTo != context.getString(R.string.where_to) &&
+                                whereFrom != context.getString(R.string.where_from)
+                    }) {
+                        Text("Далее")
+                    }
+                }
 
+            }
+        }
+    }
+    if (isWhereToVisible) {
+        var text by remember { if (whereTo != context.getString(R.string.where_to)) mutableStateOf(whereTo) else mutableStateOf("") }
+        Dialog(
+            onDismissRequest = { isWhereToVisible = false },
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(13.dp),
+                color = goTravel_theme_light_primaryContainer
+            ) {
+                Column {
+                    Text("Куда?",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center),
+                        textAlign = TextAlign.Center,
+                        fontSize = 34.sp,
+                        fontFamily = FontFamily(Font(R.font.iter)),
+                        color = goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer,
+                        fontWeight = FontWeight.Bold)
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            cursorColor = Color.Black,
+                            focusedBorderColor = goTravel_theme_light_primary,
+                            unfocusedBorderColor = goTravel_theme_light_primary)
+                    )
+                    Button(onClick = {
+                        isWhereToVisible = false
+                        whereTo = text
+                        isNextVisible = whereTo != context.getString(R.string.where_to) &&
+                                whereFrom != context.getString(R.string.where_from)
+                    }) {
+                        Text("Далее")
+                    }
+                }
+
+            }
+        }
     }
 }
 
@@ -371,6 +585,207 @@ fun ShowPopularDestinations(origin: String, context: Context) {
     }
 }
 
+@Composable
+fun ChooseTrans(context: Context, navHostController: NavHostController) {
+    findFlights("SVO", "LHR", "2024-04", context, flights)
+    findCars("Москва", "Саратов", context)
+    // TODO: loading screen
+    Text(
+        text = context.getString(R.string.transfer_option),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 50.dp),
+        textAlign = TextAlign.Center,
+        fontSize = 34.sp,
+        fontFamily = FontFamily(Font(R.font.iter))
+    )
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, bottom = 5.dp),
+            onClick = { navHostController.navigate("by_plane") },
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        painter = painterResource(id = R.drawable.airplane),
+                        contentDescription = "AirplaneIcon"
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = context.getString(R.string.by_plane),
+                        fontWeight = FontWeight.Bold
+                        )
+                }
+                if (flights.value.isNotEmpty()) {
+                    Text(
+                        text = "В среднем это займет ${flights.value[0].duration / 60} часов, " +
+                                "из них ${flights.value[0].duration_to / 60} в полете (${(flights.value[0].duration - flights.value[0].duration_to) / 60} на пересадки), " +
+                                "примерное количество пересадок ${flights.value[0].transfers}, " +
+                                "авиакомпания ${flights.value[0].airline}",
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
+        }
+        OutlinedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, bottom = 5.dp),
+            onClick = { navHostController.navigate("by_car") },
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        painter = painterResource(id = R.drawable.car),
+                        contentDescription = "CarIcon"
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 5.dp),
+                        text = context.getString(R.string.by_car),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Text("это займет столько-то, столько-то, маршруты и др и тд")
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowRouteFlights(context: Context, navHostController: NavHostController) {
+    var selectedFlight = remember { mutableStateOf(Flight("", "", "", 0, "", 0, 0, 0, ""))}
+    var isSelectedFlight = remember { mutableStateOf(false)}
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        userScrollEnabled = true
+    ) {
+        items(flights.value) { ticket ->
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, end = 10.dp, bottom = 5.dp),
+                onClick = {
+                    isSelectedFlight.value = true
+                    selectedFlight.value = ticket
+                          },
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(text = ticket.price.toString())
+                        Spacer(Modifier.size(50.dp))
+                        Text(text = ticket.date)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(text = ticket.destination)
+                        Spacer(Modifier.size(50.dp))
+                        Text(text = ticket.airline)
+                    }
+                }
+            }
+        }
+    }
+    if (isSelectedFlight.value) {
+        airlineLogo(selectedFlight.value.airline, context, logo) // TODO: мерцание и постоянно API
+        Dialog(
+            onDismissRequest = { isSelectedFlight.value = false },
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(13.dp),
+                color = goTravel_theme_light_primaryContainer
+            ) {
+                Column() {
+                    Row() {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            fontFamily = FontFamily(Font(R.font.iter)),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            text = "${selectedFlight.value.price}руб."
+                        )
+                        Spacer(modifier = Modifier.size(50.dp, 1.dp))
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily(Font(R.font.iter)),
+                            fontSize = 20.sp,
+                            text = "${selectedFlight.value.duration / 60}ч. ${selectedFlight.value.duration % 60}м."
+                        )
+                    }
+                    Row() {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            fontFamily = FontFamily(Font(R.font.iter)),
+                            fontSize = 20.sp,
+                            text = "Количество пересадок: ${selectedFlight.value.transfers}"
+                        )
+                        Image(
+                            painter = rememberAsyncImagePainter(logo.value?.asAndroidBitmap()),
+                            contentDescription = "Image from server"
+                        )
+                    }
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 20.dp),
+                        onClick = { navHostController.navigate("choose") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = goTravel_theme_light_primary,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("Далее")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(MapboxExperimental::class)
+@Composable
+fun ShowRoutesCar(context: Context, navHostController: NavHostController) {
+//    MapboxMap(
+//        Modifier.fillMaxSize(),
+//        mapViewportState = MapViewportState().apply {
+//            setCameraOptions {
+//                zoom(2.0)
+//                center(Point.fromLngLat(-98.0, 39.5))
+//                pitch(0.0)
+//                bearing(0.0)
+//            }
+//        },
+//    )
+    Button(onClick = {
+        val gmmIntentUri =
+            Uri.parse("google.navigation:q=Taronga+Zoo,+Sydney+Australia")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        startActivity(context, mapIntent, null)
+    }
+    ) {
+        Text("BUTTON")
+    }
+
+}
+
 fun convertMillisToDate(selectedDateMillis: Long): String {
     val calendar = Calendar.getInstance(TimeZone.getDefault())
     calendar.timeInMillis = selectedDateMillis
@@ -378,4 +793,12 @@ fun convertMillisToDate(selectedDateMillis: Long): String {
     val month = calendar.get(Calendar.MONTH) + 1
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     return "$day.$month.$year"
+}
+
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork
+    val capabilities = connectivityManager.getNetworkCapabilities(network)
+    return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
 }

@@ -12,9 +12,13 @@
     <string name="cancel">Отмена</string>
     <string name="no_return">Обратный билет не нужен</string>
     <string name="num_people">Количество людей</string>
-    <string name="popular_destinations">Популярные маршруты</string>
+    <string name="popular_destinations">Популярные направления</string>
     <string name="where_to">Куда</string>
     <string name="where_from">Откуда</string>
     <string name="moscow">Москва</string>
     <string name="economy">Эконом</string>
+    <string name="error_net">Ошибка подключения к сети</string>
+    <string name="transfer_option">Как добираться?</string>
+    <string name="by_plane">Самолётом</string>
+    <string name="by_car">Машиной</string>
 </resources>

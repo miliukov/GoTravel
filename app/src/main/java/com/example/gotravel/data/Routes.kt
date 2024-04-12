@@ -12,11 +12,11 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 
-fun getRoute(origin: String, destination: String, date: String, context: Context) {
-    val flights = findFlights(origin, destination, date, context)
-    // val trains = findTrains(origin, destination, date, context)
-    val cars = findCars(origin, destination, date, context)
-}
+//fun getRoute(origin: String, destination: String, date: String, context: Context, ) {
+//    val tickets: MutableState<List<Flight>> = mutableStateOf(emptyList())
+//    val flights = findFlights(origin, destination, date, context, tickets)
+//    val cars = findCars(origin, destination, date, context)
+//}
 
 fun findPopularDestinations(
     origin: String,
@@ -33,7 +33,6 @@ fun findPopularDestinations(
         url,
         { response ->
             val data = JSONObject(response).getJSONObject("data")
-            Log.d("MyLog4", data.toString())
             val airportCodes = data.keys()
             val currentList = state.value.toMutableList()
             val destinationName = mutableStateOf("")
@@ -47,7 +46,7 @@ fun findPopularDestinations(
                         ticket.getString("departure_at"),
                         ticket.getString("return_at"),
                         ticket.getString("airline"),
-                        ticket.getString("price").toInt()
+                        ticket.getString("price").toInt(),
                     )
                 )
             }

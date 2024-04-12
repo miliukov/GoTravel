@@ -28,7 +28,8 @@ private val LightColors = lightColorScheme(
     onSurface = goTravel_theme_light_onSurface,
     onSurfaceVariant = goTravel_theme_light_onSurfaceVariant,
     outline = goTravel_theme_light_outline,
-    outlineVariant = goTravel_theme_light_outlineVariant
+    outlineVariant = goTravel_theme_light_outlineVariant,
+
 )
 
 private val DarkColors = darkColorScheme(

@@ -50,6 +50,8 @@ android {
 }
 
 dependencies {
+    implementation("com.mapbox.maps:android:11.2.2")
+    implementation("com.mapbox.extension:maps-compose:11.2.2")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.android.volley:volley:1.2.1")
     implementation ("androidx.navigation:navigation-compose:2.6.0-alpha04")

@@ -6,5 +6,8 @@ data class Flight(
     val date: String,
     val duration: Int,
     val airline: String,
-    val price: Int
+    val price: Int,
+    val transfers: Int,
+    var duration_to: Int,
+    val url: String = ""
 )

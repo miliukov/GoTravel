@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 val goTravel_theme_light_primary = Color(0xFF0057FF)
 val goTravel_theme_light_primaryContainer = Color(0xFFE9F0FD)
 val goTravel_theme_light_onPrimary_onSecondary_onTertiary_onError = Color(0xFFFFFFFF)
-val goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer = Color(0xFFFFFFFF)
+val goTravel_theme_light_onPrimaryContainer_onSecondaryContainer_onTertiaryContainer = Color(0xFF000000)
 val goTravel_theme_light_secondary = Color(0xFF0070A4)
 val goTravel_theme_light_secondaryContainer = Color(0xFF82BDCE)
 val goTravel_theme_light_tertiary = Color(0xFF245A69)
